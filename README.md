@@ -1,3 +1,9 @@
+
+创建项目: 
+step1: 在"./gulp/appConfig"目录下创建一个文件<appName>.js 文件。参考模板看
+
+
+
 近期(6月底)：
 	gulp 命令完成
 

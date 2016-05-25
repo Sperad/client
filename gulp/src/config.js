@@ -1,5 +1,7 @@
 /*gulp 的配置：目录结构布局*/
 var gulp = require('gulp');
+var fs = require('fs');
+
 var minimist = require('minimist');
 
 var knownOptions = {
@@ -14,6 +16,7 @@ var config = {
 	vendorDir : './node_modules',
 	devDir : './dev',
 	appDir : './app',
+	commonDir : './common',
 	appConfig : require('../appConfig/' + options.app + '.js'),
 }
 
