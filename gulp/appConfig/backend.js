@@ -1,5 +1,10 @@
 module.exports = 
 {
+    /**
+     * [dev description]
+     * js    不需要压缩,没有dest 文件
+     * image 不需要压缩,没有dest 文件
+     */
     dev : {
         js : {
             vendor :[
@@ -7,23 +12,22 @@ module.exports =
                 "/angular-ui-bootstrap/ui-bootstrap-tpls.js"
             ],
             src : [
-                '/less/**/*.less',
+                '/**/*.js',
             ],
-            dist : '/app.less',
         },
         image : {
             src : [
-                '/less/**/*.less',
+                '/image/**/*.png',
             ]
         },
         less : {
             vendor : [
-                '/bootstrap/less/bootstrap.less',
+                // '/bootstrap/less/bootstrap.less',
             ],
             src : [
-                '/less/**/*.less',
+                '/**/*.less',
             ],
-            dist : '/app.less',
+            template : '/app.less'
         }
     }
 };

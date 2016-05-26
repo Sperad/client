@@ -11,7 +11,7 @@ var task 	= require('./task');
 
 var app = {
 	name : config.appName,
-	appDir : config.appDir + '/' + config.appName,
+	appDir : config.appDir,
 }
 gulp.task('app.bulid', function() {
 	task.appBulid(app.appDir);

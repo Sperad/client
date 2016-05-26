@@ -12,8 +12,7 @@ var task 	= require('./task');
 
 var dev = {
 	name : config.appName,
-	devDir : config.devDir + '/' + config.appName,
-	vendorDir : config.vendorDir,
+	devDir : config.devDir,
 	config : config.appConfig.dev,
 }
 
@@ -35,12 +34,26 @@ gulp.task('dev.bulid', function() {
 	task.devBulid(
 		dev.devDir,
 		dev.vendorDir,
-		config.commonDir + '/index.html'
+		config.appDir
 	);
 });
 
 gulp.task('dev.less', function() {
-	task.devLess(dev.config.less);
+	var scrList = [config.commonDir + "/**/*.less"];
+	var devLess = dev.config.less;
+	//获取vendor-Less
+	if(0 !== devLess.vendor.length)
+		scrList = scrList.concat(scrList, config.vendorDir + devLess.vendor);
+	//获取app的 src-Less
+	if(0 !== devLess.src.length)
+		scrList = scrList.concat(scrList, config.appDir + devLess.src);
+	//inject template
+	var templateLess = config.template + dev.config.less.template;
+	task.devLess(
+		dev.devDir,
+		scrList,
+		templateLess
+	);
 });
 
 gulp.task('dev.img', function() {

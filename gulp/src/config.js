@@ -14,9 +14,10 @@ var options = minimist(process.argv.slice(2), knownOptions);
 var config = {
 	appName : options.app,
 	vendorDir : './node_modules',
-	devDir : './dev',
-	appDir : './app',
+	devDir : './dev/' + options.app,
+	appDir : './app/' + options.app,
 	commonDir : './common',
+	template  : './gulp/template',
 	appConfig : require('../appConfig/' + options.app + '.js'),
 }
 
