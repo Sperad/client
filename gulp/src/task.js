@@ -6,18 +6,22 @@ var less         = require('gulp-less');
 var autoprefixer = require('gulp-autoprefixer');
 var inject       = require('gulp-inject');
 var rename       = require('gulp-rename');
+var image        = require('gulp-image');
 var concat       = require('gulp-concat');
+var replace      = require('gulp-replace-task');
+
 var sys = {
 	/*app*/
 	appBulid : appBulid,
 
 
 	/*dev*/
-	devBulid : devBulid,
-	devClean : devClean,
-	devLess : devLess,
-	devImage : devImage,
-	devJs : devJs
+	dev 	  : dev,
+	devBulid  : devBulid,
+	devClean  : devClean,
+	devLess   : devLess,
+	devImage  : devImage,
+	devScript : devScript
 };
 
 module.exports = sys;
@@ -26,8 +30,9 @@ var devDirList = {
 	css : '/css',
 	image : '/image',
 	nodeModules : '/node_modules',
-	script : '/script'
+	script : '/script',
 };
+var devIndexRoot = 'index.html';
 var appDirList = {
 	script : '/script',
 	image  : '/image',
@@ -66,7 +71,7 @@ function devBulid(devPath, vendorDir, appDir)
 		fs.mkdirSync(devPath + devDirList.css);
 		fs.mkdirSync(devPath + devDirList.image);
 	}else{
-		console.dir('编译目录 '+ devPath +'已经存在');
+		console.dir('编译目录 《'+ devPath +'》已经存在');
 	}
 }
 
@@ -75,7 +80,29 @@ function devBulid(devPath, vendorDir, appDir)
  */
 function devClean(devDir)
 {
-    gulp.src([devDir]).pipe(clean({force : true}));
+    gulp.src([
+    	devDir + devDirList.css,
+    	devDir + devDirList.image
+    ]).pipe(clean({force : true}));
+}
+
+/**
+ * 将js\css 注入到首页中
+ */
+function dev(appDir, devPath, script, templateIndex, replaceConfig){
+	var css = gulp.src(devPath + devDirList.css + "**/*.css", {read : false})
+	var vendorJs = gulp.src(script.vendor, {read : false});
+	var srcJs = gulp.src(script.src, {read : false});
+	return  gulp.src(templateIndex)
+	    		.pipe(inject(css, {ignorePath: devPath.substr(1) , name:'vendorCss'}))
+
+	    		.pipe(inject(vendorJs, {name:'vendorJs'}))
+	    		.pipe(inject(srcJs, {ignorePath: appDir.substr(1), name:'appJs'}))
+
+	    		.pipe(replace(replaceConfig))
+	    		.pipe(concat(devIndexRoot))
+	    		.pipe(gulp.dest(devPath))
+	    	;
 }
 
 /**
@@ -83,11 +110,11 @@ function devClean(devDir)
  * ./common/less
  * appConfig 配置文件中的  less.vender 和 less.src
  */
-function devLess(devPath, scrList, templateLess)
+function devLess(devPath, srcList, templateLess)
 {
 	return gulp.src(templateLess)
 			.pipe(
-				inject(gulp.src(scrList, {read: false}),{name:'srcLess', relative: true})
+				inject(gulp.src(srcList, {read: false}),{name:'srcLess', relative: true})
 			)
 			.pipe(less())
 			.pipe(autoprefixer())
@@ -97,10 +124,16 @@ function devLess(devPath, scrList, templateLess)
 	        );
 }
 
-function devImage(image){
-
+function devImage(devPath, srcList)
+{
+	return gulp.src(srcList)
+	    	.pipe(image())
+	    	.pipe(
+	    		gulp.dest(devPath + devDirList.image)
+	    	);
 }
-function devJs(js){
+
+function devScript(js){
 
 }
 

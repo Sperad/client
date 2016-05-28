@@ -14,39 +14,56 @@ var dev = {
 	name : config.appName,
 	devDir : config.devDir,
 	config : config.appConfig.dev,
-}
+};
+
+gulp.task('dev.bulid', function() {
+	task.devBulid(
+		dev.devDir,
+		config.vendorDir,
+		config.appDir
+	);
+});
 
 gulp.task('dev',['dev.clean'], function() {
-	//less
-	task.devLess(dev.config.less);
-	//image
-	task.devImage(dev.config.image);
-	//js
-	task.devJs(dev.config.js);
-	//inject
+	gulp.start('dev.image') //image
+	gulp.start('dev.less')  //less
+	//inject templateIndex
+	var templateIndex = config.template + dev.config.template;
+	var script = dev.config.script;
+	for(var index in script.vendor){
+		script.vendor[index] =  config.vendorDir + script.vendor[index];
+	}
+	for(var index in script.src){
+		script.src[index] = config.appDir + script.src[index];
+	}
+	task.dev(
+		config.appDir,
+		dev.devDir,
+		script,
+		templateIndex,
+		dev.config.replace
+	);
 });
 
 gulp.task('dev.clean', function() {
 	task.devClean(dev.devDir);
 });
 
-gulp.task('dev.bulid', function() {
-	task.devBulid(
-		dev.devDir,
-		dev.vendorDir,
-		config.appDir
-	);
-});
-
 gulp.task('dev.less', function() {
-	var scrList = [config.commonDir + "/**/*.less"];
 	var devLess = dev.config.less;
+	var scrList = [];
 	//获取vendor-Less
-	if(0 !== devLess.vendor.length)
-		scrList = scrList.concat(scrList, config.vendorDir + devLess.vendor);
+	if('vendor' in devLess && devLess.vendor.length !== 0){
+		scrList = scrList.concat(config.vendorDir + devLess.vendor);
+	}
+	//获取common-less
+	if('common' in devLess && devLess.common.length !== 0){
+		scrList = scrList.concat(config.commonDir + devLess.common );
+	}
 	//获取app的 src-Less
-	if(0 !== devLess.src.length)
-		scrList = scrList.concat(scrList, config.appDir + devLess.src);
+	if('src' in devLess && devLess.src.length !== 0){
+		scrList = scrList.concat(config.appDir    + devLess.src);
+	}
 	//inject template
 	var templateLess = config.template + dev.config.less.template;
 	task.devLess(
@@ -56,6 +73,22 @@ gulp.task('dev.less', function() {
 	);
 });
 
-gulp.task('dev.img', function() {
-	task.devImage(dev.config.image);
+gulp.task('dev.image', function() {
+	var devImage = dev.config.image;
+	var scrList = [];
+	//获取common-image
+	if('common' in devImage)
+		scrList = scrList.concat(config.commonDir + devImage.common );
+	//获取app的 src-Image
+	if('src' in devImage)
+		scrList = scrList.concat(config.appDir    + devImage.src);
+	task.devImage(
+		dev.devDir,
+		scrList
+	);
+});
+
+gulp.task('dev.script', function() {
+	//注入
+	task.devScript();
 });
