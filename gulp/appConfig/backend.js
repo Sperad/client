@@ -9,7 +9,8 @@ module.exports =
         template : '/index.html',
         script : {
             vendor :[
-                "/vue/src/index.js",
+                "/vue/dist/vue.js",
+                "/vue-router/dist/vue-router.js",
             ],
             src : [
                 '/script/**/*.js',
