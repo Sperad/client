@@ -5,6 +5,7 @@ module.exports =
         script : {
             vendor :[
                 '/angular/angular.js',
+                '/angular-ui-router/release/angular-ui-router.js',
             ],
             src : [
                 '/script/**/*.js',
@@ -18,6 +19,9 @@ module.exports =
         less : {
             vendor : [
                 '/bootstrap/less/bootstrap.less'
+            ],
+            common : [
+                '/less/bootstrap.itian.less'
             ],
             src : [
                 '/less/**/*.less',

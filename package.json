@@ -27,6 +27,6 @@
   },
   "dependencies": {
     "angular": "^1.5.6",
-    "vue": "^1.0.24"
+    "angular-ui-router": "^0.3.1",
   }
 }
