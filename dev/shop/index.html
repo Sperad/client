@@ -2,12 +2,13 @@
 <html lang="en" ng-app="app">
 	<head>
 		<title>shop</title>
-		<base href="@@webRoot/index.html">
+		<base href="/index.html">
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<!--build:css css/vendor.css-->
             <!-- vendorCss:css -->
+            <link rel="stylesheet" href="/css/app.min.css">
             <!-- endinject -->
 		<!--/build-->
 	</head>
@@ -19,10 +20,13 @@
     </body>
 		<!--build:js js/vendor.js-->
 	        <!-- vendorJs:js -->
+	        <script src="/node_modules/vue/dist/vue.js"></script>
+	        <script src="/node_modules/vue-router/dist/vue-router.js"></script>
 	        <!-- endinject -->
 		<!--/build-->
 		<!--build:js js/index.js-->
 	        <!-- appJs:js -->
+	        <script src="/script/index.js"></script>
 	        <!-- endinject -->
 		<!--/build-->
 </html>
