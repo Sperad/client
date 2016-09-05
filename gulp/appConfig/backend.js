@@ -6,7 +6,7 @@ module.exports =
      * image 不需要压缩,没有dest 文件、没有vendor目录
      */
     dev : {
-        template : '/index.html',
+        template : '/backend.html',
         script : {
             vendor :[
                 "/vue/dist/vue.js",
