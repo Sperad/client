@@ -32,6 +32,4 @@
 
 ##目标
 * 项目
-	* 后台管理系统
-	* github 静态文件生成
-	* 前端vue + express， 后端php(框架待定), 数据库Mysql
+	* shop商城

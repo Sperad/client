@@ -33,7 +33,7 @@ var devDirList = {
 	script : '/script',
 };
 var devIndexRoot = 'index.html';
-var appDirList = {
+var srcDirList = {
 	script : '/script',
 	image  : '/image',
 	less   : '/less'
@@ -47,8 +47,8 @@ var appDirList = {
 function appBulid(appPath){
 	if(!fs.existsSync(appPath)) {
 		fs.mkdirSync(appPath);
-		for(dirName in appDirList){
-			fs.mkdirSync(appPath + appDirList[dirName]);
+		for(dirName in srcDirList){
+			fs.mkdirSync(appPath + srcDirList[dirName]);
 		}
 	}else{
 		console.dir('开发目录 '+ appPath +'已经存在');
@@ -62,12 +62,12 @@ function appBulid(appPath){
  * 	jsDir    	 : './dev/<appName>/script'-----------------软连接
  *  node_modules : './dev/<appName>/node_modules' ------软连接
  */
-function devBulid(devPath, vendorDir, appDir)
+function devBulid(devPath, vendorDir, srcDir)
 {
 	if(!fs.existsSync(devPath)) {
 		fs.mkdirSync(devPath);
 		gulp.src(vendorDir).pipe(symlink(devPath + devDirList.nodeModules, {force : true}));
-		gulp.src(appDir + appDirList.script ).pipe(symlink(devPath + devDirList.script, {force : true}));
+		gulp.src(srcDir + srcDirList.script ).pipe(symlink(devPath + devDirList.script, {force : true}));
 		fs.mkdirSync(devPath + devDirList.css);
 		fs.mkdirSync(devPath + devDirList.image);
 	}else{
@@ -89,7 +89,7 @@ function devClean(devDir)
 /**
  * 将js\css 注入到首页中
  */
-function dev(appDir, devPath, script, templateIndex, replaceConfig){
+function dev(srcDir, devPath, script, templateIndex, replaceConfig){
 	var css = gulp.src(devPath + devDirList.css + "**/*.css", {read : false})
 	var vendorJs = gulp.src(script.vendor, {read : false});
 	var srcJs = gulp.src(script.src, {read : false});
@@ -97,7 +97,7 @@ function dev(appDir, devPath, script, templateIndex, replaceConfig){
 	    		.pipe(inject(css, {ignorePath: devPath.substr(1) , name:'vendorCss'}))
 
 	    		.pipe(inject(vendorJs, {name:'vendorJs'}))
-	    		.pipe(inject(srcJs, {ignorePath: appDir.substr(1), name:'appJs'}))
+	    		.pipe(inject(srcJs, {ignorePath: srcDir.substr(1), name:'appJs'}))
 
 	    		.pipe(replace(replaceConfig))
 	    		.pipe(concat(devIndexRoot))

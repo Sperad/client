@@ -26,6 +26,7 @@
     "require-dir": "^0.3.0"
   },
   "dependencies": {
-    "vue": "^1.0.24"
+    "vue": "^1.0.24",
+    "vue-loader": "^8.5.2"
   }
 }

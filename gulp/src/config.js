@@ -15,7 +15,7 @@ var config = {
 	appName : options.app,
 	vendorDir : './node_modules',
 	devDir : './dev/' + options.app,
-	appDir : './app/' + options.app,
+	srcDir : './app/' + options.app,
 	commonDir : './common',
 	template  : './gulp/template',
 	appConfig : require('../appConfig/' + options.app + '.js'),

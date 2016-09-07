@@ -20,7 +20,7 @@ gulp.task('dev.bulid', function() {
 	task.devBulid(
 		dev.devDir,
 		config.vendorDir,
-		config.appDir
+		config.srcDir
 	);
 });
 
@@ -34,10 +34,10 @@ gulp.task('dev',['dev.clean'], function() {
 		script.vendor[index] =  config.vendorDir + script.vendor[index];
 	}
 	for(var index in script.src){
-		script.src[index] = config.appDir + script.src[index];
+		script.src[index] = config.srcDir + script.src[index];
 	}
 	task.dev(
-		config.appDir,
+		config.srcDir,
 		dev.devDir,
 		script,
 		templateIndex,
@@ -62,7 +62,7 @@ gulp.task('dev.less', function() {
 	}
 	//获取app的 src-Less
 	if('src' in devLess && devLess.src.length !== 0){
-		scrList = scrList.concat(config.appDir    + devLess.src);
+		scrList = scrList.concat(config.srcDir    + devLess.src);
 	}
 	//inject template
 	var templateLess = config.template + dev.config.less.template;
@@ -81,7 +81,7 @@ gulp.task('dev.image', function() {
 		scrList = scrList.concat(config.commonDir + devImage.common );
 	//获取app的 src-Image
 	if('src' in devImage)
-		scrList = scrList.concat(config.appDir    + devImage.src);
+		scrList = scrList.concat(config.srcDir    + devImage.src);
 	task.devImage(
 		dev.devDir,
 		scrList
