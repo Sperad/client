@@ -27,8 +27,6 @@ gulp.task('dev.clean', function() {
 });
 
 gulp.task('dev',['dev.clean', 'dev.css', 'dev.image'], function() {
-	// gulp.start('dev.image') //image
-	// gulp.start('dev.css')  //css
 	gulp.start('dev.inject') //inject
 });
 

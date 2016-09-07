@@ -9,6 +9,8 @@ var rename       = require('gulp-rename');
 var image        = require('gulp-image');
 var concat       = require('gulp-concat');
 var replace      = require('gulp-replace-task');
+var named = require('vinyl-named');
+var webpack = require('gulp-webpack');
 
 var sys = {
 	/*app*/
@@ -20,12 +22,18 @@ var sys = {
 	devCss    : devCss,
 	devImage  : devImage,
 	devInjectToHtml : devInjectToHtml,
+	devWebpack : devWebpack,
 };
 
 module.exports = sys;
 var nodeModules = '/node_modules';
 var devIndexRoot = 'index.html';
 
+var defaultDirs = {
+	script : '/script',
+	image : '/image',
+	css : '/css'
+};
 /**
  * 创建项目文件：
  * 	lessDir  : './app/<appName>/less'
@@ -65,7 +73,7 @@ function devBulid(dev, vendorDir, srcDir)
 		fs.mkdirSync(dev.dir + devConfig.css.dir);
 		fs.mkdirSync(dev.dir + devConfig.image.dir);
 	}else{
-		console.dir('编译目录 《'+ devConfig +'》已经存在');
+		console.dir('编译目录 《'+ devConfig.dir +'》已经存在');
 	}
 }
 
@@ -81,7 +89,7 @@ function devClean(dev)
     if(dev.config.hasOwnProperty('webpack')){
     	path.push(dev.dir + dev.config.script.dir);
     }
-    gulp.src(path).pipe(clean({force : false}));
+    gulp.src(path).pipe(clean({force : true}));
 }
 
 /**
@@ -118,16 +126,38 @@ function devInjectToHtml(srcDir, dev, script, templateIndex)
 	var css = gulp.src(dev.dir + dev.config.css.dir + "**/*.css", {read : false});
 	var vendorJs = gulp.src(script.vendor, {read : false});
 	var srcJs = gulp.src(script.src, {read : false});
+	if(dev.config.hasOwnProperty('webpack')){
+		__devWebpack();
+	}else{
+		__devInject();
+	}
 
-	gulp.src(templateIndex)
-		.pipe(inject(css, {ignorePath: dev.dir.substr(1) , name:'vendorCss'}))
+	function __devInject()
+	{
+		gulp.src(templateIndex)
+				.pipe(inject(css, {ignorePath: dev.dir.substr(1) , name:'vendorCss'}))
 
-		.pipe(inject(vendorJs, {name:'vendorJs'}))
-		.pipe(inject(srcJs, {ignorePath: srcDir.substr(1), name:'appJs'}))
+				.pipe(inject(vendorJs, {name:'vendorJs'}))
+				.pipe(inject(srcJs, {ignorePath: srcDir.substr(1), name:'appJs'}))
 
-		.pipe(replace(dev.config.replace))
-		.pipe(concat(devIndexRoot))
-		.pipe(gulp.dest(dev.dir))
-	;
+				.pipe(replace(dev.config.replace))
+				.pipe(concat(devIndexRoot))
+				.pipe(gulp.dest(dev.dir))
+			;
+	}
+	/**
+	 * 1.获取webpack 配置文件
+	 * 2.合并配置文件
+	 * 3.生成js
+	 * 4.注入js
+	 */
+	function __devWebpack()
+	{	var webpackConfig = dev.config.webpack;
+		
+		gulp.src(srcJs)
+	      .pipe(webpack(webpackConfig))
+	      .pipe(named())
+	      .pipe(gulp.dest(dev.config.script.dir));
+	}
 }
 

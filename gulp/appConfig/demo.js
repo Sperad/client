@@ -5,7 +5,7 @@ module.exports =
      * ex: /app/demo/script/
      */
     dev : {
-        // webpack : {},
+        webpack : {},
         injectFile : 'index.html',
         template : '/index.html',
         script : {
