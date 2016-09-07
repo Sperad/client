@@ -14,30 +14,18 @@ var sys = {
 	/*app*/
 	appBulid : appBulid,
 
-
 	/*dev*/
-	dev 	  : dev,
 	devBulid  : devBulid,
 	devClean  : devClean,
-	devLess   : devLess,
+	devCss    : devCss,
 	devImage  : devImage,
-	devScript : devScript
+	devInjectToHtml : devInjectToHtml,
 };
 
 module.exports = sys;
-
-var devDirList = {
-	css : '/css',
-	image : '/image',
-	nodeModules : '/node_modules',
-	script : '/script',
-};
+var nodeModules = '/node_modules';
 var devIndexRoot = 'index.html';
-var srcDirList = {
-	script : '/script',
-	image  : '/image',
-	less   : '/less'
-};
+
 /**
  * 创建项目文件：
  * 	lessDir  : './app/<appName>/less'
@@ -47,8 +35,8 @@ var srcDirList = {
 function appBulid(appPath){
 	if(!fs.existsSync(appPath)) {
 		fs.mkdirSync(appPath);
-		for(dirName in srcDirList){
-			fs.mkdirSync(appPath + srcDirList[dirName]);
+		for(dirName in defaultDirs){
+			fs.mkdirSync(appPath + defaultDirs[dirName]);
 		}
 	}else{
 		console.dir('开发目录 '+ appPath +'已经存在');
@@ -61,48 +49,39 @@ function appBulid(appPath){
  * 	imageDir 	 : './dev/<appName>/image'
  * 	jsDir    	 : './dev/<appName>/script'-----------------软连接
  *  node_modules : './dev/<appName>/node_modules' ------软连接
+ *  如果配置webpack选项则创建目录
  */
-function devBulid(devPath, vendorDir, srcDir)
+function devBulid(dev, vendorDir, srcDir)
 {
-	if(!fs.existsSync(devPath)) {
-		fs.mkdirSync(devPath);
-		gulp.src(vendorDir).pipe(symlink(devPath + devDirList.nodeModules, {force : true}));
-		gulp.src(srcDir + srcDirList.script ).pipe(symlink(devPath + devDirList.script, {force : true}));
-		fs.mkdirSync(devPath + devDirList.css);
-		fs.mkdirSync(devPath + devDirList.image);
+	devConfig = dev.config;
+	if(!fs.existsSync(dev.dir)) {
+		fs.mkdirSync(dev.dir); //创建目录
+		if(devConfig.hasOwnProperty('webpack')){
+			fs.mkdirSync(dev.dir + devConfig.script.dir);
+		}else{
+			gulp.src(vendorDir).pipe(symlink(dev.dir + nodeModules, {force : true}));
+			gulp.src(srcDir + devConfig.script.dir).pipe(symlink(dev.dir + devConfig.script.dir, {force : true}));
+		}
+		fs.mkdirSync(dev.dir + devConfig.css.dir);
+		fs.mkdirSync(dev.dir + devConfig.image.dir);
 	}else{
-		console.dir('编译目录 《'+ devPath +'》已经存在');
+		console.dir('编译目录 《'+ devConfig +'》已经存在');
 	}
 }
 
 /**
  * './dev/<appName>'整个目录将会被清除
  */
-function devClean(devDir)
+function devClean(dev)
 {
-    gulp.src([
-    	devDir + devDirList.css,
-    	devDir + devDirList.image
-    ]).pipe(clean({force : true}));
-}
-
-/**
- * 将js\css 注入到首页中
- */
-function dev(srcDir, devPath, script, templateIndex, replaceConfig){
-	var css = gulp.src(devPath + devDirList.css + "**/*.css", {read : false})
-	var vendorJs = gulp.src(script.vendor, {read : false});
-	var srcJs = gulp.src(script.src, {read : false});
-	return  gulp.src(templateIndex)
-	    		.pipe(inject(css, {ignorePath: devPath.substr(1) , name:'vendorCss'}))
-
-	    		.pipe(inject(vendorJs, {name:'vendorJs'}))
-	    		.pipe(inject(srcJs, {ignorePath: srcDir.substr(1), name:'appJs'}))
-
-	    		.pipe(replace(replaceConfig))
-	    		.pipe(concat(devIndexRoot))
-	    		.pipe(gulp.dest(devPath))
-	    	;
+	var path = [
+    	dev.dir + dev.config.css.dir,
+    	dev.dir + dev.config.image.dir,
+    ];
+    if(dev.config.hasOwnProperty('webpack')){
+    	path.push(dev.dir + dev.config.script.dir);
+    }
+    gulp.src(path).pipe(clean({force : false}));
 }
 
 /**
@@ -110,30 +89,45 @@ function dev(srcDir, devPath, script, templateIndex, replaceConfig){
  * ./common/less
  * appConfig 配置文件中的  less.vender 和 less.src
  */
-function devLess(devPath, srcList, templateLess)
+function devCss(dev, srcList, templateCss)
 {
-	return gulp.src(templateLess)
-			.pipe(
-				inject(gulp.src(srcList, {read: false}),{name:'srcLess', relative: true})
-			)
-			.pipe(less())
-			.pipe(autoprefixer())
-	        .pipe(rename({ suffix: '.min' }))
-	        .pipe(
-	        	gulp.dest(devPath + devDirList.css) 
-	        );
+	gulp.src(templateCss)
+		.pipe( inject(gulp.src(srcList, {read: false}),{name:'srcLess', relative: true}) )
+		.pipe(less())
+		.pipe(autoprefixer())
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(
+        	gulp.dest(dev.dir + dev.config.css.dir)
+        );
 }
 
-function devImage(devPath, srcList)
+function devImage(dev, srcList)
 {
-	return gulp.src(srcList)
-	    	.pipe(image())
-	    	.pipe(
-	    		gulp.dest(devPath + devDirList.image)
-	    	);
+	gulp.src(srcList)
+    	.pipe(image())
+    	.pipe(
+    		gulp.dest(dev.dir + dev.config.image.dir)
+    	);
 }
 
-function devScript(js){
+/**
+ * 将js\css 注入到首页中
+ */
+function devInjectToHtml(srcDir, dev, script, templateIndex)
+{
+	var css = gulp.src(dev.dir + dev.config.css.dir + "**/*.css", {read : false});
+	var vendorJs = gulp.src(script.vendor, {read : false});
+	var srcJs = gulp.src(script.src, {read : false});
 
+	gulp.src(templateIndex)
+		.pipe(inject(css, {ignorePath: dev.dir.substr(1) , name:'vendorCss'}))
+
+		.pipe(inject(vendorJs, {name:'vendorJs'}))
+		.pipe(inject(srcJs, {ignorePath: srcDir.substr(1), name:'appJs'}))
+
+		.pipe(replace(dev.config.replace))
+		.pipe(concat(devIndexRoot))
+		.pipe(gulp.dest(dev.dir))
+	;
 }
 

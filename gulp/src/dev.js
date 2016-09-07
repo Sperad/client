@@ -11,84 +11,86 @@ var config  = require('./config');
 var task 	= require('./task');
 
 var dev = {
-	name : config.appName,
-	devDir : config.devDir,
-	config : config.appConfig.dev,
-};
-
+	dir : config.devDir,
+	config : config.appConfig.dev
+}
 gulp.task('dev.bulid', function() {
 	task.devBulid(
-		dev.devDir,
+		dev,
 		config.vendorDir,
 		config.srcDir
 	);
 });
 
-gulp.task('dev',['dev.clean'], function() {
-	gulp.start('dev.image') //image
-	gulp.start('dev.less')  //less
-	//inject templateIndex
-	var templateIndex = config.template + dev.config.template;
-	var script = dev.config.script;
-	for(var index in script.vendor){
-		script.vendor[index] =  config.vendorDir + script.vendor[index];
-	}
-	for(var index in script.src){
-		script.src[index] = config.srcDir + script.src[index];
-	}
-	task.dev(
-		config.srcDir,
-		dev.devDir,
-		script,
-		templateIndex,
-		dev.config.replace
-	);
-});
-
 gulp.task('dev.clean', function() {
-	task.devClean(dev.devDir);
+	task.devClean(dev);
 });
 
-gulp.task('dev.less', function() {
-	var devLess = dev.config.less;
-	var scrList = [];
-	//获取vendor-Less
-	if('vendor' in devLess && devLess.vendor.length !== 0){
-		scrList = scrList.concat(config.vendorDir + devLess.vendor);
+gulp.task('dev',['dev.clean', 'dev.css', 'dev.image'], function() {
+	// gulp.start('dev.image') //image
+	// gulp.start('dev.css')  //css
+	gulp.start('dev.inject') //inject
+});
+
+gulp.task('dev.css', function() {
+	var devCss = dev.config.css;
+	var srcList = [];
+	//获取vendor-css
+	if(devCss.hasOwnProperty('vendor')){
+		devCss.vendor.forEach(function(item){
+			srcList.push(config.srcDir +  devCss.dir + item);
+		});
 	}
-	//获取common-less
-	if('common' in devLess && devLess.common.length !== 0){
-		scrList = scrList.concat(config.commonDir + devLess.common );
+	//获取app的 src-css
+	if(devCss.hasOwnProperty('src')){
+		devCss.src.forEach(function(item){
+			srcList.push(config.srcDir +  devCss.dir + item);
+		});
 	}
-	//获取app的 src-Less
-	if('src' in devLess && devLess.src.length !== 0){
-		scrList = scrList.concat(config.srcDir    + devLess.src);
-	}
-	//inject template
-	var templateLess = config.template + dev.config.less.template;
-	task.devLess(
-		dev.devDir,
-		scrList,
-		templateLess
+
+	var templateCss = config.templateDir + dev.config.css.template;
+	task.devCss(
+		dev,
+		srcList,
+		templateCss
 	);
 });
 
 gulp.task('dev.image', function() {
 	var devImage = dev.config.image;
-	var scrList = [];
-	//获取common-image
-	if('common' in devImage)
-		scrList = scrList.concat(config.commonDir + devImage.common );
-	//获取app的 src-Image
-	if('src' in devImage)
-		scrList = scrList.concat(config.srcDir    + devImage.src);
+	var srcList = [];
+	if(devImage.hasOwnProperty('src')){
+		devImage.src.forEach(function(item){
+			srcList.push(config.srcDir +  devImage.dir + item);
+		});
+	}
 	task.devImage(
-		dev.devDir,
-		scrList
+		dev,
+		srcList
 	);
 });
 
-gulp.task('dev.script', function() {
-	//注入
-	task.devScript();
+gulp.task('dev.inject', function() {
+	var templateIndex = config.templateDir + dev.config.template;
+	var script = dev.config.script;
+
+	var srcList = {vendor : [], src : [] };
+	if(script.hasOwnProperty('vendor')){
+		script.vendor.forEach(function(item){
+			srcList.vendor.push(config.vendorDir + item);
+		});
+	}
+
+	if(script.hasOwnProperty('src')){
+		script.src.forEach(function(item){
+			srcList.src.push(config.srcDir + item);
+		});
+	}
+
+	task.devInjectToHtml(
+		config.srcDir,
+		dev,
+		srcList,
+		templateIndex
+	);
 });

@@ -26,7 +26,10 @@
     "require-dir": "^0.3.0"
   },
   "dependencies": {
+    "path": "^0.12.7",
+    "vinyl-named": "^1.1.0",
     "vue": "^1.0.24",
-    "vue-loader": "^8.5.2"
+    "vue-loader": "^8.5.2",
+    "webpack": "^1.13.2"
   }
 }

@@ -16,9 +16,9 @@ var config = {
 	vendorDir : './node_modules',
 	devDir : './dev/' + options.app,
 	srcDir : './app/' + options.app,
-	commonDir : './common',
-	template  : './gulp/template',
-	appConfig : require('../appConfig/' + options.app + '.js'),
+	templateDir  : './gulp/template',
+	webpack : require('./webpack.config'),
+    appConfig : require('../appConfig/' + options.app + '.js'),
 }
 
 module.exports = config;

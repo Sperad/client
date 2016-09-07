@@ -1,0 +1,8 @@
+/* srcLess:less */
+a {
+  background: red;
+}
+a .new {
+  font: 24px;
+}
+/* endinject */

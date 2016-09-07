@@ -1,38 +1,36 @@
 module.exports = 
 {
     /**
-     * [dev description]
-     * js    不需要压缩,没有dest 文件、没有common目录
-     * image 不需要压缩,没有dest 文件、没有vendor目录
+     * dir: 是指app目录下的目录名称,
+     * ex: /app/demo/script/
      */
     dev : {
+        // webpack : {},
+        injectFile : 'index.html',
         template : '/index.html',
         script : {
+            dir : '/script', 
             vendor :[
                 "/vue/dist/vue.js",
                 "/vue-router/dist/vue-router.js",
             ],
             src : [
-                '/script/**/*.js',
+                '/**/*.js',
             ],
         },
         image : {
-            common :  [
-                '/image/**/*.*',
-            ],
+            dir : '/image',
             src : [
-                '/image/**/*.*',
+                '/**/*.*',
             ],
         },
-        less : {
+        css : {
+            dir : '/less',
             vendor : [
                 // '/bootstrap/less/bootstrap.less',
             ],
             src : [
-                '/less/**/*.less',
-            ],
-            common :  [
-                '/less/**/*.less',
+                '/**/*.less',
             ],
             template : '/app.less'
         },

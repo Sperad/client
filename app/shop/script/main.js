@@ -1,6 +1,6 @@
 // import Register from './components/register.vue';
 
-/*var App = Vue.extend({})
+var App = Vue.extend({})
 var router = new VueRouter()
 
 router.map({
@@ -10,4 +10,4 @@ router.map({
         }
     }
 })
-router.start(App, '#app')*/
+router.start(App, '#app')

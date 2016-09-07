@@ -8,6 +8,7 @@ module.exports =
     dev : {
         template : '/index.html',
         script : {
+            dir : '/script/',
             vendor :[
                 "/vue/dist/vue.js",
                 "/vue-router/dist/vue-router.js",
