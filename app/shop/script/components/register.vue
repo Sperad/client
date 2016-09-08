@@ -1,6 +1,6 @@
 <style>
     .header{
-        margin-top: 20px;
+        margin-top: 20px ;
     }
 </style>
 
@@ -15,7 +15,7 @@
     module.exports = {
         data : function (){
             return {
-                msg : 'xxxx, hello';
+                msg : 'xxxx, hello'
             }
         }
     }

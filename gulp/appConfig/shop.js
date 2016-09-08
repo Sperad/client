@@ -1,39 +1,39 @@
 module.exports = 
 {
     /**
-     * [dev description]
-     * js    不需要压缩,没有dest 文件、没有common目录
-     * image 不需要压缩,没有dest 文件、没有vendor目录
+     * dir: 是指app目录下的目录名称,
+     * ex: /app/demo/script/
      */
     dev : {
-        template : '/index.html',
+        webpack : {
+            // entry : { index : 'index.js' },
+        },
+        injectFile : 'index.html',
+        template : '/webpack_index.html',
         script : {
-            dir : '/script/',
+            dir : '/script', 
             vendor :[
                 "/vue/dist/vue.js",
                 "/vue-router/dist/vue-router.js",
             ],
             src : [
-                '/script/**/*.js',
+                '/**/*.js',
+                '/**/*.vue',
             ],
         },
         image : {
-            common :  [
-                '/image/**/*.*',
-            ],
+            dir : '/image',
             src : [
-                '/image/**/*.*',
+                '/**/*.*',
             ],
         },
-        less : {
+        css : {
+            dir : '/less',
             vendor : [
-                '/bootstrap/less/bootstrap.less',
+                // '/bootstrap/less/bootstrap.less',
             ],
             src : [
-                '/less/**/*.less',
-            ],
-            common :  [
-                '/less/**/*.less',
+                '/**/*.less',
             ],
             template : '/app.less'
         },
@@ -42,7 +42,7 @@ module.exports =
          */
         replace : {
             patterns: [
-               {match: 'webRoot', replacement: ''},
+               {match: 'webRoot', replacement: 'Shop商城'},
            ]
         }
     }

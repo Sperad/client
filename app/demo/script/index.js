@@ -1,3 +1,3 @@
-var h2= document.createElement("h2")
-h2.innerHTML="不是吧，那么快第二个打包程序啦！";
-document.body.appendChild(h2);
+    
+/*** entry.js ***/
+document.getElementById('app').innerHTML="这是我第一个打包成功的程序";

@@ -41,7 +41,7 @@ module.exports =
          */
         replace : {
             patterns: [
-               {match: 'webRoot', replacement: ''},
+               {match: 'webRoot', replacement: '你好'},
            ]
         }
     }

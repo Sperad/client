@@ -1,13 +1,11 @@
-// import Register from './components/register.vue';
+import Register from './components/register.vue';
 
-/*var App = Vue.extend({})
+var App = Vue.extend({})
 var router = new VueRouter()
 
 router.map({
     '/': {
-        component: function(){
-            return "aaaa";
-        }
+        component: Register
     }
 })
-router.start(App, '#app')*/
+router.start(App, '#app')

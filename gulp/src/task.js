@@ -67,9 +67,9 @@ function devBulid(dev, vendorDir, srcDir)
 		if(devConfig.hasOwnProperty('webpack')){
 			fs.mkdirSync(dev.dir + devConfig.script.dir);
 		}else{
-			gulp.src(vendorDir).pipe(symlink(dev.dir + nodeModules, {force : true}));
 			gulp.src(srcDir + devConfig.script.dir).pipe(symlink(dev.dir + devConfig.script.dir, {force : true}));
 		}
+		gulp.src(vendorDir).pipe(symlink(dev.dir + nodeModules, {force : true}));
 		fs.mkdirSync(dev.dir + devConfig.css.dir);
 		fs.mkdirSync(dev.dir + devConfig.image.dir);
 	}else{
@@ -127,6 +127,7 @@ function devInjectToHtml(config, dev, srcList, templateIndex)
 		__devInject();
 	}
 
+
 	function __devInject()
 	{
 		var css = gulp.src(dev.dir + dev.config.css.dir + "**/*.css", {read : false});
@@ -145,26 +146,28 @@ function devInjectToHtml(config, dev, srcList, templateIndex)
 	}
 	/**
 	 * 1.获取webpack 配置文件
-	 * 2.生成js
-	 * 3.合并配置文件
+	 * 2.合并配置文件
+	 * 3.生成js
 	 * 4.注入js
 	 */
 	function __devWebpack()
 	{	
 		var conf = extend({}, config.webpack, dev.config.webpack);
-		// var scriptList = script.vendor.concat( script.src);
-		var scriptList = script.src;
-		var srcPath = scriptList.concat(srcList.css);
 		conf.entry.index = config.srcDir + dev.config.script.dir +  conf.entry.index;
-
-		gulp.src(srcPath)
+		//生成js
+		gulp.src(script.src)
 	      .pipe(webpack(conf))
 	      .pipe(named())
 	      .pipe(gulp.dest(dev.dir + dev.config.script.dir));
 
-	    var vendorJs = gulp.src(dev.dir + dev.config.script.dir +  "**/*.js", {read : false});
+	    //注入文件
+	    var vendorJs = gulp.src(script.vendor, {read : false});
+	    var srcJs = gulp.src(dev.dir + dev.config.script.dir +  "/**/*.js", {read : false});
 	    gulp.src(templateIndex)
-	    	.pipe(inject(vendorJs, {ignorePath: dev.dir.substr(1) , name:'vendorJs'}))
+	    	.pipe(inject(vendorJs, {name:'vendorJs'}))
+	    	.pipe(inject(srcJs, {ignorePath: dev.dir.substr(1), name:'appJs'}))
+	    	.pipe(replace(dev.config.replace))
+			.pipe(concat(devIndexRoot))
 	    	.pipe(gulp.dest(dev.dir))
 	}
 }
