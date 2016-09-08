@@ -15,10 +15,10 @@ var config = {
 	appName : options.app,
 	vendorDir : './node_modules',
 	devDir : './dev/' + options.app,
-	appDir : './app/' + options.app,
-	commonDir : './common',
-	template  : './gulp/template',
-	appConfig : require('../appConfig/' + options.app + '.js'),
+	srcDir : './app/' + options.app,
+	templateDir  : './gulp/template',
+	webpack : require('./webpack.config'),
+    appConfig : require('../appConfig/' + options.app + '.js'),
 }
 
 module.exports = config;

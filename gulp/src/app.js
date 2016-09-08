@@ -9,10 +9,6 @@ var gulp = require('gulp');
 var config  = require('./config');
 var task 	= require('./task');
 
-var app = {
-	name : config.appName,
-	appDir : config.appDir,
-}
 gulp.task('app.bulid', function() {
-	task.appBulid(app.appDir);
+	task.appBulid(config.srcDir);
 });
