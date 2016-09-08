@@ -3,10 +3,9 @@
  * 默认全局配置
  */
 webpackConfig = {
-    entry : { index : '/index.js' },
+    entry : { index : '/index.js' },    //自动找 : /app/<demo>/script/index.js
     output: {
-        path: '/script/',
-        filename: '[name].js',
+        filename: '[name].js',  //默认输出到 : /dev/<demo>/script/index.js
     },
     module: {
         loaders: [

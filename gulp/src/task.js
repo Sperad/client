@@ -27,7 +27,7 @@ var sys = {
 
 module.exports = sys;
 var nodeModules = '/node_modules';
-var devIndexRoot = 'index.html';
+var devIndexRoot = 'index.html'; //注入合并后的入口文件名
 
 var defaultDirs = {
 	script : '/script',
