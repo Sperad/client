@@ -26,27 +26,17 @@ gulp.task('dev.clean', function() {
 	task.devClean(dev);
 });
 
-gulp.task('dev',['dev.clean', 'dev.css', 'dev.image'], function() {
+gulp.task('dev',['dev.clean'], function() {
+	if(!dev.config.hasOwnProperty('webpack')){
+		gulp.start('dev.css');
+		gulp.start('dev.image');
+	}
 	gulp.start('dev.inject') //inject
 });
 
 gulp.task('dev.css', function() {
-	var devCss = dev.config.css;
-	var srcList = [];
-	//获取vendor-css
-	if(devCss.hasOwnProperty('vendor')){
-		devCss.vendor.forEach(function(item){
-			srcList.push(config.srcDir +  devCss.dir + item);
-		});
-	}
-	//获取app的 src-css
-	if(devCss.hasOwnProperty('src')){
-		devCss.src.forEach(function(item){
-			srcList.push(config.srcDir +  devCss.dir + item);
-		});
-	}
-
 	var templateCss = config.templateDir + dev.config.css.template;
+	var srcList = getCssAll();
 	task.devCss(
 		dev,
 		srcList,
@@ -70,8 +60,41 @@ gulp.task('dev.image', function() {
 
 gulp.task('dev.inject', function() {
 	var templateIndex = config.templateDir + dev.config.template;
-	var script = dev.config.script;
+	var srcList = {
+		css: getCssAll(),
+		script: getJsAll(),
+	};
 
+	task.devInjectToHtml(
+		config,
+		dev,
+		srcList,
+		templateIndex
+	);
+});
+
+function getCssAll()
+{
+	var devCss = dev.config.css;
+	var srcList = [];
+	//获取vendor-css
+	if(devCss.hasOwnProperty('vendor')){
+		devCss.vendor.forEach(function(item){
+			srcList.push(config.srcDir +  devCss.dir + item);
+		});
+	}
+	//获取app的 src-css
+	if(devCss.hasOwnProperty('src')){
+		devCss.src.forEach(function(item){
+			srcList.push(config.srcDir +  devCss.dir + item);
+		});
+	}
+	return srcList;
+}
+
+function getJsAll()
+{
+	var script = dev.config.script;
 	var srcList = {vendor : [], src : [] };
 	if(script.hasOwnProperty('vendor')){
 		script.vendor.forEach(function(item){
@@ -84,11 +107,5 @@ gulp.task('dev.inject', function() {
 			srcList.src.push(config.srcDir + item);
 		});
 	}
-
-	task.devInjectToHtml(
-		config.srcDir,
-		dev,
-		srcList,
-		templateIndex
-	);
-});
+	return srcList;
+}

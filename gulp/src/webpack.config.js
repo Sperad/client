@@ -3,7 +3,7 @@
  * 默认全局配置
  */
 webpackConfig = {
-    entry : { index : 'index.js' },
+    entry : { index : '/index.js' },
     output: {
         path: '/script/',
         filename: '[name].js',

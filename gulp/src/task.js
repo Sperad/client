@@ -11,6 +11,7 @@ var concat       = require('gulp-concat');
 var replace      = require('gulp-replace-task');
 var named = require('vinyl-named');
 var webpack = require('gulp-webpack');
+var extend = require('extend');
 
 var sys = {
 	/*app*/
@@ -21,8 +22,7 @@ var sys = {
 	devClean  : devClean,
 	devCss    : devCss,
 	devImage  : devImage,
-	devInjectToHtml : devInjectToHtml,
-	devWebpack : devWebpack,
+	devInjectToHtml : devInjectToHtml
 };
 
 module.exports = sys;
@@ -94,19 +94,16 @@ function devClean(dev)
 
 /**
  * 编译css 文件: 包含三部分[scrDir]
- * ./common/less
  * appConfig 配置文件中的  less.vender 和 less.src
  */
 function devCss(dev, srcList, templateCss)
 {
 	gulp.src(templateCss)
-		.pipe( inject(gulp.src(srcList, {read: false}),{name:'srcLess', relative: true}) )
+		.pipe(inject(gulp.src(srcList, {read: false}),{name:'srcLess', relative: true}) )
 		.pipe(less())
 		.pipe(autoprefixer())
         .pipe(rename({ suffix: '.min' }))
-        .pipe(
-        	gulp.dest(dev.dir + dev.config.css.dir)
-        );
+        .pipe(gulp.dest(dev.dir + dev.config.css.dir));
 }
 
 function devImage(dev, srcList)
@@ -121,11 +118,9 @@ function devImage(dev, srcList)
 /**
  * 将js\css 注入到首页中
  */
-function devInjectToHtml(srcDir, dev, script, templateIndex)
+function devInjectToHtml(config, dev, srcList, templateIndex)
 {
-	var css = gulp.src(dev.dir + dev.config.css.dir + "**/*.css", {read : false});
-	var vendorJs = gulp.src(script.vendor, {read : false});
-	var srcJs = gulp.src(script.src, {read : false});
+	var script = srcList.script;
 	if(dev.config.hasOwnProperty('webpack')){
 		__devWebpack();
 	}else{
@@ -134,11 +129,14 @@ function devInjectToHtml(srcDir, dev, script, templateIndex)
 
 	function __devInject()
 	{
+		var css = gulp.src(dev.dir + dev.config.css.dir + "**/*.css", {read : false});
+		var vendorJs = gulp.src(script.vendor, {read : false});
+		var srcJs = gulp.src(script.src, {read : false});
 		gulp.src(templateIndex)
 				.pipe(inject(css, {ignorePath: dev.dir.substr(1) , name:'vendorCss'}))
 
 				.pipe(inject(vendorJs, {name:'vendorJs'}))
-				.pipe(inject(srcJs, {ignorePath: srcDir.substr(1), name:'appJs'}))
+				.pipe(inject(srcJs, {ignorePath: config.srcDir.substr(1), name:'appJs'}))
 
 				.pipe(replace(dev.config.replace))
 				.pipe(concat(devIndexRoot))
@@ -147,17 +145,27 @@ function devInjectToHtml(srcDir, dev, script, templateIndex)
 	}
 	/**
 	 * 1.获取webpack 配置文件
-	 * 2.合并配置文件
-	 * 3.生成js
+	 * 2.生成js
+	 * 3.合并配置文件
 	 * 4.注入js
 	 */
 	function __devWebpack()
-	{	var webpackConfig = dev.config.webpack;
-		
-		gulp.src(srcJs)
-	      .pipe(webpack(webpackConfig))
+	{	
+		var conf = extend({}, config.webpack, dev.config.webpack);
+		// var scriptList = script.vendor.concat( script.src);
+		var scriptList = script.src;
+		var srcPath = scriptList.concat(srcList.css);
+		conf.entry.index = config.srcDir + dev.config.script.dir +  conf.entry.index;
+
+		gulp.src(srcPath)
+	      .pipe(webpack(conf))
 	      .pipe(named())
-	      .pipe(gulp.dest(dev.config.script.dir));
+	      .pipe(gulp.dest(dev.dir + dev.config.script.dir));
+
+	    var vendorJs = gulp.src(dev.dir + dev.config.script.dir +  "**/*.js", {read : false});
+	    gulp.src(templateIndex)
+	    	.pipe(inject(vendorJs, {ignorePath: dev.dir.substr(1) , name:'vendorJs'}))
+	    	.pipe(gulp.dest(dev.dir))
 	}
 }
 
