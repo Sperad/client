@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="app">
 	<head>
-		<title>iTian</title>
-		<base href="@@webRoot/index.html">
+		<title>shop</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,8 +10,11 @@
             <!-- endinject -->
 		<!--/build-->
 	</head>
-	<body ng-controller="mainCtrl">
-		<div ui-view></div>
+	<body>
+		<div id="app">
+			<!-- 路由外链 -->
+		  	<router-view></router-view>
+		</div>
     </body>
 		<!--build:js js/vendor.js-->
 	        <!-- vendorJs:js -->
